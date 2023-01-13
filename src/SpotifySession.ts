@@ -12,6 +12,22 @@ export default interface SpotifySession {
     accessToken: string;
 
     /**
+     * The auth code for the CODE authentication flow.
+     *
+     * @type {string}
+     * @memberof SpotifySession
+     */
+    code?: string;
+
+    /**
+     * The auth state for the CODE authentication flow.
+     *
+     * @type {string}
+     * @memberof SpotifySession
+     */
+    state?: string;
+
+    /**
      * The refresh token.
      *
      * @type {string}
