@@ -1,0 +1,2 @@
+include ':spotify-auth-lib'
+include ':spotify-app-remote'
