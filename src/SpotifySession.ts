@@ -20,12 +20,12 @@ export default interface SpotifySession {
     code?: string;
 
     /**
-     * The auth state for the CODE authentication flow.
+     * The auth code_verifier for the CODE authentication flow.
      *
      * @type {string}
      * @memberof SpotifySession
      */
-    state?: string;
+    code_verifier?: string;
 
     /**
      * The refresh token.

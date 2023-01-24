@@ -3,6 +3,7 @@ package com.reactlibrary;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.util.Base64;
 
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Promise;
@@ -17,6 +18,8 @@ import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
 
+import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 
 
@@ -29,7 +32,7 @@ public class RNSpotifyRemoteAuthModule extends ReactContextBaseJavaModule implem
     private AuthorizationResponse mAuthResponse;
     private ReadableMap mConfig;
     private ConnectionParams.Builder mConnectionParamsBuilder;
-
+    private static final String CODE_VERIFIER = getCodeVerifier();
 
     public ConnectionParams.Builder getConnectionParamsBuilder() {
         return mConnectionParamsBuilder;
@@ -39,6 +42,21 @@ public class RNSpotifyRemoteAuthModule extends ReactContextBaseJavaModule implem
         super(reactContext);
         reactContext.addActivityEventListener(this);
         this.reactContext = reactContext;
+    }
+
+    private static String getCodeVerifier() {
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] code = new byte[64];
+        secureRandom.nextBytes(code);
+        return Base64.encodeToString(code, Base64.URL_SAFE | Base64.NO_WRAP | Base64.NO_PADDING);
+    }
+
+    public static String getCodeChallenge(String verifier) {
+        byte[] bytes = verifier.getBytes();
+        MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+        messageDigest.update(bytes, 0, bytes.length);
+        byte[] digest = messageDigest.digest();
+        return Base64.encodeToString(digest, Base64.URL_SAFE | Base64.NO_WRAP | Base64.NO_PADDING);
     }
 
     @ReactMethod
@@ -64,6 +82,8 @@ public class RNSpotifyRemoteAuthModule extends ReactContextBaseJavaModule implem
                 redirectUri
         );
         builder.setScopes(scopes);
+        builder.setCustomParam("code_challenge_method", "S256");
+        builder.setCustomParam("code_challenge", getCodeChallenge(CODE_VERIFIER));
         AuthorizationRequest request = builder.build();
         AuthorizationClient.openLoginActivity(getCurrentActivity(), REQUEST_CODE, request);
     }
@@ -83,7 +103,9 @@ public class RNSpotifyRemoteAuthModule extends ReactContextBaseJavaModule implem
                 case CODE:
                     if (authPromise != null) {
                         mAuthResponse = response;
-                        authPromise.resolve(Convert.toMap(response));
+                        ReadableMap responseMap = Convert.toMap(response);
+                        responseMap.putString("code_verifier", CODE_VERIFIER);
+                        authPromise.resolve(responseMap);
                     }
                     break;
 
