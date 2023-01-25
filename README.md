@@ -72,6 +72,12 @@ npm install --save react-native-spotify-remote
 > Add the following to your Android Manifest:
 >
 > `<queries> <package android:name="com.spotify.music" /> </queries>`
+> 
+> **All Android versions**
+> 
+> To make sure `.aar` from the Spotify Remote SDK is correctly included in release Gradle builds, you need to append your `settings.gradle` config:
+> 
+> ```include ':react-native-spotify-remote:spotify-app-remote'```
 
 ## Linking
 
@@ -163,6 +169,7 @@ import com.reactlibrary.RNSpotifyRemotePackage;
 
    ```
    include ':react-native-spotify-remote'
+   include ':react-native-spotify-remote:spotify-app-remote'
    project(':react-native-spotify-remote').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-spotify-remote/android')
    ```
 
