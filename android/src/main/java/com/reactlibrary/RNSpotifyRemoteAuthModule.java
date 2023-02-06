@@ -17,6 +17,7 @@ import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 
 
@@ -64,8 +65,21 @@ public class RNSpotifyRemoteAuthModule extends ReactContextBaseJavaModule implem
                 redirectUri
         );
         builder.setScopes(scopes);
+        builder.setState(generateState());
         AuthorizationRequest request = builder.build();
         AuthorizationClient.openLoginActivity(getCurrentActivity(), REQUEST_CODE, request);
+    }
+
+    private static String generateState() {
+        final int STATE_LENGTH = 16;
+        final String ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        SecureRandom secureRandom = new SecureRandom();
+        StringBuilder sb = new StringBuilder(STATE_LENGTH);
+        for (int i = 0; i < STATE_LENGTH; i++) {
+            int randomIndex = secureRandom.nextInt(ALPHABET.length());
+            sb.append(ALPHABET.charAt(randomIndex));
+        }
+        return sb.toString();
     }
 
     @Override
