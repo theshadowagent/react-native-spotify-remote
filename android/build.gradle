@@ -67,7 +67,7 @@ repositories {
 }
 
 dependencies {
-    implementation "com.spotify.android:auth:1.2.3"
+    implementation "com.spotify.android:auth:2.0.2"
     implementation project(':react-native-spotify-remote:spotify-app-remote')
     implementation "com.google.code.gson:gson:2.8.5"  // needed by spotify-app-remote
     //noinspection GradleDynamicVersion
